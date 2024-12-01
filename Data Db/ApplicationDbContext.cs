@@ -10,6 +10,7 @@ namespace Hostel_Management.Data
         public required DbSet<User> Users { get; set; }
         public required DbSet<Room> Rooms { get; set; }
         public required DbSet<Reservation> Reservations { get; set; }
+        public required DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -63,8 +64,26 @@ namespace Hostel_Management.Data
                       .HasForeignKey(e => e.RoomId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.ToTable("Payments");
+                entity.HasKey(e => e.PaymentId);
+                entity.Property(e => e.PaymentId).ValueGeneratedOnAdd();
+                entity.Property(e => e.ReservationId).IsRequired();
+                entity.Property(e => e.Amount).IsRequired().HasColumnType("decimal(18,2)");
+                entity.Property(e => e.PaymentMethod).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.PaymentFor).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.PaymentDate).IsRequired();
+                entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+
+                // Define foreign key relationship
+                entity.HasOne<Reservation>()
+                      .WithMany()
+                      .HasForeignKey(e => e.ReservationId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
         }
     }
 }
-
-

@@ -7,6 +7,8 @@ using Hostel_Management.Services;
 using Hostel_Management.Services.JWT;
 using Hostel_Management.Data;
 using Hostel_Management.Repositories;
+using Hostel_Management.Repositories.Payment_Repo;
+using Hostel_Management.Services.Payment_Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,9 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
 
 // add auth
 builder.Services.AddAuthentication(options =>

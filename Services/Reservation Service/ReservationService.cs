@@ -20,6 +20,19 @@ namespace Hostel_Management.Services
         {
             return _reservationRepository.GetAllReservations();
         }
+        public IEnumerable<Reservation> GetPendingReservations()
+        {
+            return _reservationRepository.GetReservationsByStatus("Pending");
+        }
+        public IEnumerable<Reservation> GetApprovedReservations()
+        {
+            return _reservationRepository.GetReservationsByStatus("Approved");
+        }
+
+        public IEnumerable<Reservation> GetRejectedReservations()
+        {
+            return _reservationRepository.GetReservationsByStatus("Rejected");
+        }
 
         public Reservation GetReservationById(int reservationId)
         {
@@ -114,7 +127,7 @@ namespace Hostel_Management.Services
         public IEnumerable<Room> GetAvailableRooms(DateTime checkInDate, DateTime checkOutDate)
         {
             var reservedRoomIds = _reservationRepository.GetAllReservations()
-                .Where(r => r.CheckInDate.Date < checkOutDate.Date && r.CheckOutDate.Date > checkInDate.Date)
+                .Where(r => r.CheckInDate.Date < checkOutDate.Date && r.CheckOutDate.Date > checkInDate.Date && (r.Status=="Approved" || r.Status=="Pending"))
                 .Select(r => r.RoomId)
                 .Distinct()
                 .ToList();
@@ -122,6 +135,19 @@ namespace Hostel_Management.Services
             return _roomRepository.GetAllRooms()
                 .Where(r => !reservedRoomIds.Contains(r.RoomId) && r.Availability)
                 .ToList();
+        }
+
+        public void UpdateReservationStatus(int reservationId, string status)
+        {
+            var reservation = _reservationRepository.GetReservationById(reservationId);
+            if (reservation == null)
+            {
+                throw new Exception("Reservation not found.");
+            }
+
+            reservation.Status = status;
+            _reservationRepository.UpdateReservation(reservation);
+            _reservationRepository.SaveChanges();
         }
     }
 }
