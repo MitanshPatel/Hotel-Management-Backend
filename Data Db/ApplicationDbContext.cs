@@ -11,6 +11,7 @@ namespace Hostel_Management.Data
         public required DbSet<Room> Rooms { get; set; }
         public required DbSet<Reservation> Reservations { get; set; }
         public required DbSet<Payment> Payments { get; set; }
+        public required DbSet<Service> Services { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -81,6 +82,27 @@ namespace Hostel_Management.Data
                 entity.HasOne<Reservation>()
                       .WithMany()
                       .HasForeignKey(e => e.ReservationId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Service>(entity =>
+            {
+                entity.ToTable("Services");
+                entity.HasKey(e => e.ServiceId);
+                entity.Property(e => e.ServiceId).ValueGeneratedOnAdd();
+                entity.Property(e => e.ReservationId).IsRequired();
+                entity.Property(e => e.RoomId).IsRequired();
+                entity.Property(e => e.HousekeepingId).IsRequired(false);
+                entity.Property(e => e.ServiceType).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.GuestId).IsRequired();
+                entity.Property(e => e.RequestTime).IsRequired();
+                entity.Property(e => e.DeliveryTime).IsRequired(false);
+                entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+
+                // Define foreign key relationship
+                entity.HasOne<User>()
+                      .WithMany()
+                      .HasForeignKey(e => e.GuestId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
 

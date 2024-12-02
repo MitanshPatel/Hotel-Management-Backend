@@ -1,4 +1,6 @@
-﻿using Hostel_Management.Repositories.Payment_Repo;
+﻿using Hostel_Management.Models;
+using Hostel_Management.Repositories.Payment_Repo;
+using Hostel_Management.Repositories.Service_Repo;
 
 namespace Hostel_Management.Services.Payment_Service
 {
@@ -6,11 +8,13 @@ namespace Hostel_Management.Services.Payment_Service
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly IReservationRepository _reservationRepository;
+        private readonly IServiceRepository _serviceRepository;
 
-        public PaymentService(IPaymentRepository paymentRepository, IReservationRepository reservationRepository)
+        public PaymentService(IPaymentRepository paymentRepository, IReservationRepository reservationRepository, IServiceRepository serviceRepository)
         {
             _paymentRepository = paymentRepository;
             _reservationRepository = reservationRepository;
+            _serviceRepository = serviceRepository;
         }
 
         public IEnumerable<Payment> GetAllPayments()
@@ -36,12 +40,17 @@ namespace Hostel_Management.Services.Payment_Service
             // Check if the reservation status is "Approved"
             if (reservation != null && reservation.Status == "Approved")
             {
-                var existingPayments = _paymentRepository.GetPaymentsByReservationId(payment.ReservationId)
-                                                 .Where(p => p.PaymentFor == "Booking" && p.Status == "Successful");
-                if (existingPayments.Any())
+                // Check if a successful payment already exists for the "Booking" service
+                if (payment.PaymentFor.StartsWith("Room"))
                 {
-                    return "Payment cannot be processed because a payment for the room has already been made.";
+                    var existingRoomPayments = _paymentRepository.GetPaymentsByReservationId(payment.ReservationId)
+                                                                 .Where(p => p.PaymentFor.StartsWith("Booking") && p.Status == "Successful");
+                    if (existingRoomPayments.Any())
+                    {
+                        return "A successful payment has already been made for the room for this reservation.";
+                    }
                 }
+
                 payment.Status = "Successful";
                 _paymentRepository.AddPayment(payment);
                 _paymentRepository.SaveChanges();
@@ -50,7 +59,25 @@ namespace Hostel_Management.Services.Payment_Service
                 reservation.PaymentStatus = payment.Status;
                 _reservationRepository.UpdateReservation(reservation);
                 _reservationRepository.SaveChanges();
-                return "Successful";
+
+                // Add service request if payment is for food or other services
+                if (payment.PaymentFor.StartsWith("Food") || payment.PaymentFor.StartsWith("Services"))
+                {
+                    var serviceType = payment.PaymentFor;
+                    var service = new Service
+                    {
+                        ServiceType = serviceType,
+                        GuestId = reservation.GuestId,
+                        ReservationId = reservation.ReservationId,
+                        RoomId = reservation.RoomId,
+                        RequestTime = DateTime.Now,
+                        Status = "Pending"
+                    };
+                    _serviceRepository.AddService(service);
+                    _serviceRepository.SaveChanges();
+                }
+
+                return "Payment processed successfully.";
             }
             else
             {
@@ -58,6 +85,7 @@ namespace Hostel_Management.Services.Payment_Service
                 return "Payment cannot be processed because the reservation is not approved.";
             }
         }
+
 
 
         public void UpdatePayment(Payment payment)
