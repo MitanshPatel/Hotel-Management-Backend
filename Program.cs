@@ -43,6 +43,12 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IStaffScheduleService, StaffScheduleService>();
+builder.Services.AddScoped<IStaffScheduleRepository, StaffScheduleRepository>();
+builder.Services.AddScoped<IStaffShiftService, StaffShiftService>();
+builder.Services.AddScoped<IStaffShiftRepository, StaffShiftRepository>();
+builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
+builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 
 
 // add auth

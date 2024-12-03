@@ -12,6 +12,9 @@ namespace Hostel_Management.Data
         public required DbSet<Reservation> Reservations { get; set; }
         public required DbSet<Payment> Payments { get; set; }
         public required DbSet<Service> Services { get; set; }
+        public DbSet<StaffShift> StaffShifts { get; set; }
+        public DbSet<StaffSchedule> StaffSchedules { get; set; } 
+        public DbSet<LeaveRequest> LeaveRequests { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -104,6 +107,39 @@ namespace Hostel_Management.Data
                       .WithMany()
                       .HasForeignKey(e => e.GuestId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<StaffShift>(entity =>
+            {
+                entity.ToTable("StaffShifts");
+                entity.HasKey(e => e.StaffShiftId);
+                entity.Property(e => e.StaffShiftId).ValueGeneratedOnAdd();
+                entity.Property(e => e.StaffId).IsRequired();
+                entity.Property(e => e.ShiftType).IsRequired().HasMaxLength(50);
+
+            });
+
+            modelBuilder.Entity<StaffSchedule>(entity =>
+            {
+                entity.ToTable("StaffSchedules");
+                entity.HasKey(e => e.ScheduleId);
+                entity.Property(e => e.ScheduleId).ValueGeneratedOnAdd();
+                entity.Property(e => e.StaffId).IsRequired();
+                entity.Property(e => e.ShiftType).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.ShiftStartTime).IsRequired();
+                entity.Property(e => e.ShiftEndTime).IsRequired();
+                entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<LeaveRequest>(entity =>
+            {
+                entity.ToTable("LeaveRequests");
+                entity.HasKey(e => e.LeaveRequestId);
+                entity.Property(e => e.LeaveRequestId).ValueGeneratedOnAdd();
+                entity.Property(e => e.StaffId).IsRequired();
+                entity.Property(e => e.StartDate).IsRequired();
+                entity.Property(e => e.EndDate).IsRequired();
+                entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             });
 
         }
