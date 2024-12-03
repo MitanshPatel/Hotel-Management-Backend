@@ -49,6 +49,8 @@ builder.Services.AddScoped<IStaffShiftService, StaffShiftService>();
 builder.Services.AddScoped<IStaffShiftRepository, StaffShiftRepository>();
 builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 
 // add auth

@@ -15,6 +15,7 @@ namespace Hostel_Management.Data
         public DbSet<StaffShift> StaffShifts { get; set; }
         public DbSet<StaffSchedule> StaffSchedules { get; set; } 
         public DbSet<LeaveRequest> LeaveRequests { get; set; } 
+        public DbSet<Review> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -140,6 +141,18 @@ namespace Hostel_Management.Data
                 entity.Property(e => e.StartDate).IsRequired();
                 entity.Property(e => e.EndDate).IsRequired();
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.ToTable("Reviews");
+                entity.HasKey(e => e.ReviewId);
+                entity.Property(e => e.ReviewId).ValueGeneratedOnAdd();
+                entity.Property(e => e.GuestId).IsRequired();
+                entity.Property(e => e.ReservationId).IsRequired();
+                entity.Property(e => e.Rating).IsRequired();
+                entity.Property(e => e.Comments).HasMaxLength(1000);
+                entity.Property(e => e.ReviewDate).IsRequired();
             });
 
         }
