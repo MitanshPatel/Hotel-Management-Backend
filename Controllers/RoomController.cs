@@ -8,6 +8,7 @@ namespace Hostel_Management.Controllers
 {
     [ApiController]
     [Route("api/room")]
+    [Produces("application/json")]
     public class RoomController : ControllerBase
     {
         private readonly IRoomService _roomService;
@@ -55,7 +56,7 @@ namespace Hostel_Management.Controllers
             }
 
             _roomService.UpdateRoom(room);
-            return Ok("Room Updated");
+            return Ok(new { msg = "Room Updated" });
         }
 
         [Authorize(Roles = "Manager, Receptionist")]
@@ -63,10 +64,7 @@ namespace Hostel_Management.Controllers
         public IActionResult DeleteRoom(int roomId)
         {
             _roomService.DeleteRoom(roomId);
-            return Ok("Room Deleted");
+            return Ok(new { msg = "Room Deleted" });
         }
-
-        
     }
 }
-
