@@ -10,6 +10,7 @@
         public string? Status { get; set; }  // Pending, Approved, Rejected
         public string? PaymentStatus { get; set; }
         public string? SpecialRequests { get; set; }
+        public int TotalAmount { get; set; }
     }
 }
 

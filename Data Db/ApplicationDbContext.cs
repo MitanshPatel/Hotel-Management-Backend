@@ -57,6 +57,7 @@ namespace Hostel_Management.Data
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.PaymentStatus).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.SpecialRequests).HasMaxLength(500);
+                entity.Property(e => e.TotalAmount).IsRequired().HasColumnType("decimal(18,2)");
 
                 // Define foreign key relationships
                 entity.HasOne<User>()

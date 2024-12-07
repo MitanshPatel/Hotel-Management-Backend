@@ -1,4 +1,5 @@
 ﻿using Hostel_Management.Services.Service_Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -15,6 +16,7 @@ namespace Hostel_Management.Controllers
             _serviceService = serviceService;
         }
 
+        [Authorize(Roles = "Housekeeping")]
         [HttpGet("food")]
         public IActionResult GetFoodServices()
         {
@@ -22,6 +24,7 @@ namespace Hostel_Management.Controllers
             return Ok(services);
         }
 
+        [Authorize(Roles = "Housekeeping")]
         [HttpGet("services")]
         public IActionResult GetOtherServices()
         {
@@ -29,6 +32,7 @@ namespace Hostel_Management.Controllers
             return Ok(services);
         }
 
+        [Authorize(Roles = "Housekeeping")]
         [HttpGet("pending")]
         public IActionResult GetPendingServices()
         {
@@ -36,6 +40,23 @@ namespace Hostel_Management.Controllers
             return Ok(services);
         }
 
+        [Authorize(Roles = "Housekeeping")]
+        [HttpGet("pending-food")]
+        public IActionResult GetPendingFoodServices()
+        {
+            var services = _serviceService.GetAllServices().Where(s => s.ServiceType.StartsWith("Food") && s.Status == "Pending");
+            return Ok(services);
+        }
+
+        [Authorize(Roles = "Housekeeping")]
+        [HttpGet("pending-services")]
+        public IActionResult GetPendingOtherServices()
+        {
+            var services = _serviceService.GetAllServices().Where(s => s.ServiceType.StartsWith("Service") && s.Status == "Pending");
+            return Ok(services);
+        }
+
+        [Authorize(Roles = "Housekeeping")]
         [HttpPut("{id}/under-process")]
         public IActionResult UnderProcessService(int id)
         {
@@ -52,9 +73,10 @@ namespace Hostel_Management.Controllers
             service.HousekeepingId = housekeepingId;
             _serviceService.UpdateService(service);
 
-            return Ok("Service under process");
+            return Ok(new { msg = "Service under process" });
         }
 
+        [Authorize(Roles = "Housekeeping")]
         [HttpPut("{id}/complete")]
         public IActionResult CompleteService(int id)
         {
@@ -77,7 +99,35 @@ namespace Hostel_Management.Controllers
             service.Status = "Completed";
             _serviceService.UpdateService(service);
 
-            return Ok("Service completed");
+            return Ok(new { msg = "Service completed" });
+        }
+
+        [Authorize(Roles = "Guest")]
+        [HttpGet("my-food")]
+        public IActionResult GetMyFoodServices()
+        {
+            var guestIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (guestIdClaim == null)
+            {
+                return Unauthorized();
+            }
+            var guestId = int.Parse(guestIdClaim);
+            var services = _serviceService.GetAllServices().Where(s => s.ServiceType.StartsWith("Food") && s.GuestId == guestId);
+            return Ok(services);
+        }
+
+        [Authorize(Roles = "Guest")]
+        [HttpGet("my-services")]
+        public IActionResult GetMyOtherServices()
+        {
+            var guestIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (guestIdClaim == null)
+            {
+                return Unauthorized();
+            }
+            var guestId = int.Parse(guestIdClaim);
+            var services = _serviceService.GetAllServices().Where(s => s.ServiceType.StartsWith("Service") && s.GuestId == guestId);
+            return Ok(services);
         }
     }
 }

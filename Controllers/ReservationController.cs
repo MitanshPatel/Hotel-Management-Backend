@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Hostel_Management.Models;
 using Hostel_Management.Services;
 using System.Security.Claims;
+using Microsoft.VisualBasic;
 
 namespace Hostel_Management.Controllers
 {
@@ -60,32 +61,14 @@ namespace Hostel_Management.Controllers
             reservation.GuestId = int.Parse(guestIdClaim);
             if (!_reservationService.BookRoom(reservation))
             {
-                return BadRequest("Room is not available for the selected dates.");
+                return BadRequest(new { msg = "Room is not available for the selected dates." });
             }
             return CreatedAtAction(nameof(GetReservationById), new { reservationId = reservation.ReservationId }, reservation);
         }
 
         [Authorize(Roles = "Guest")]
-        [HttpPut("{reservationId}")]
-        public IActionResult UpdateReservation(int reservationId, [FromBody] Reservation reservation)
-        {
-            var guestIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (guestIdClaim == null)
-            {
-                return Unauthorized();
-            }
-            if (reservationId != reservation.ReservationId || reservation.GuestId != int.Parse(guestIdClaim))
-            {
-                return BadRequest();
-            }
-
-            _reservationService.UpdateReservation(reservation);
-            return Ok("Reservation Updated");
-        }
-
-        [Authorize(Roles = "Guest")]
-        [HttpDelete("{reservationId}")]
-        public IActionResult DeleteReservation(int reservationId)
+        [HttpPut("{reservationId}/cancel")]
+        public IActionResult CancelReservation(int reservationId)
         {
             var guestIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (guestIdClaim == null)
@@ -95,20 +78,40 @@ namespace Hostel_Management.Controllers
             var reservation = _reservationService.GetReservationById(reservationId);
             if (reservation == null || reservation.GuestId != int.Parse(guestIdClaim))
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            _reservationService.DeleteReservation(reservationId);
-            return Ok("Reservation Deleted");
+            reservation.Status = "Cancelled";
+            _reservationService.UpdateReservation(reservation);
+            return Ok(new { msg="Reservation Cancelled"});
         }
 
-        [Authorize(Roles = "Manager, Receptionist")]
-        [HttpGet("all-reservations")]
-        public IActionResult GetAllReservations()
-        {
-            var reservations = _reservationService.GetAllReservations();
-            return Ok(reservations);
-        }
+        //[Authorize(Roles = "Guest")]
+        //[HttpDelete("{reservationId}")]
+        //public IActionResult DeleteReservation(int reservationId)
+        //{
+        //    var guestIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //    if (guestIdClaim == null)
+        //    {
+        //        return Unauthorized();
+        //    }
+        //    var reservation = _reservationService.GetReservationById(reservationId);
+        //    if (reservation == null || reservation.GuestId != int.Parse(guestIdClaim))
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _reservationService.DeleteReservation(reservationId);
+        //    return Ok("Reservation Deleted");
+        //}
+
+        //[Authorize(Roles = "Manager, Receptionist")]
+        //[HttpGet("all-reservations")]
+        //public IActionResult GetAllReservations()
+        //{
+        //    var reservations = _reservationService.GetAllReservations();
+        //    return Ok(reservations);
+        //}
 
         [Authorize(Roles = "Guest")]
         [HttpGet("room-availability-check")]

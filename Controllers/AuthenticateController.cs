@@ -3,6 +3,8 @@ using Hostel_Management.Models;
 using Hostel_Management.Services;
 using Hostel_Management.Services.JWT;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hostel_Management.Controllers
 {
@@ -22,41 +24,51 @@ namespace Hostel_Management.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] User user)
         {
-            var currentUser = HttpContext.User;
-            var currentUserRole = currentUser.FindFirst("role")?.Value;
-
-            if (currentUserRole == null)
+            // Only guests can register themselves
+            if (user.Role != "Guest")
             {
-                // Only guests can register themselves
-                if (user.Role != "Guest")
-                {
-                    return Forbid("Only guests can register themselves.");
-                }
-            }
-            else if (currentUserRole == "Admin")
-            {
-                // Admin can register new admins, managers, receptionists, and housekeeping staff
-                if (user.Role != "Admin" && user.Role != "Manager" && user.Role != "Receptionist" && user.Role != "Housekeeping")
-                {
-                    return Forbid("Admin can only register new admins, managers, receptionists, and housekeeping staff.");
-                }
-            }
-            else if (currentUserRole == "Manager")
-            {
-                // Manager can register new receptionists and housekeeping staff
-                if (user.Role != "Receptionist" && user.Role != "Housekeeping")
-                {
-                    return Forbid("Manager can only register new receptionists and housekeeping staff.");
-                }
-            }
-            else
-            {
-                return Forbid("You do not have permission to register new users.");
+                return BadRequest(new { msg = "Only guests can register themselves." });
             }
 
             if (!_userService.RegisterUser(user))
             {
-                return BadRequest("User already exists");
+                return BadRequest(new { msg = "User already exists" });
+            }
+
+            return Ok(new { msg = "User registered successfully" });
+        }
+
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpPost("register-admin-manager")]
+        public IActionResult RegisterAdminManager([FromBody] User user)
+        {
+            var currentUser = HttpContext.User;
+            var currentUserRole = currentUser.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (currentUserRole == "Admin")
+            {
+                // Admin can register any role except Guest
+                if (user.Role == "Guest")
+                {
+                    return BadRequest(new { msg = "Admin cannot register a Guest." });
+                }
+            }
+            else if (currentUserRole == "Manager")
+            {
+                // Manager can register any role except Guest and Admin
+                if (user.Role == "Guest" || user.Role == "Admin")
+                {
+                    return BadRequest(new { msg = "Manager cannot register a Guest or Admin." });
+                }
+            }
+            else
+            {
+                return Forbid();
+            }
+
+            if (!_userService.RegisterUser(user))
+            {
+                return BadRequest(new { msg = "User already exists" });
             }
 
             return Ok(new { msg = "User registered successfully" });
@@ -76,3 +88,5 @@ namespace Hostel_Management.Controllers
         }
     }
 }
+
+

@@ -15,7 +15,7 @@ namespace Hostel_Management.Controllers
             _reservationService = reservationService;
         }
 
-        [Authorize(Roles = "Receptionist")]
+        [Authorize(Roles = "Receptionist, Manager")]
         [HttpGet("all")]
         public IActionResult GetAllReservations()
         {
@@ -23,7 +23,7 @@ namespace Hostel_Management.Controllers
             return Ok(reservations);
         }
 
-        [Authorize(Roles = "Receptionist")]
+        [Authorize(Roles = "Receptionist, Manager")]
         [HttpGet("pending")]
         public IActionResult GetPendingReservations()
         {
@@ -31,7 +31,7 @@ namespace Hostel_Management.Controllers
             return Ok(reservations);
         }
 
-        [Authorize(Roles = "Receptionist")]
+        [Authorize(Roles = "Receptionist, Manager")]
         [HttpGet("approved")]
         public IActionResult GetApprovedReservations()
         {
@@ -39,7 +39,7 @@ namespace Hostel_Management.Controllers
             return Ok(reservations);
         }
 
-        [Authorize(Roles = "Receptionist")]
+        [Authorize(Roles = "Receptionist, Manager")]
         [HttpGet("rejected")]
         public IActionResult GetRejectedReservations()
         {
@@ -47,7 +47,7 @@ namespace Hostel_Management.Controllers
             return Ok(reservations);
         }
 
-        [Authorize(Roles = "Receptionist")]
+        [Authorize(Roles = "Receptionist, Manager")]
         [HttpGet("{reservationId}")]
         public IActionResult GetReservationById(int reservationId)
         {
@@ -59,12 +59,17 @@ namespace Hostel_Management.Controllers
             return Ok(reservation);
         }
 
-        [Authorize(Roles = "Receptionist")]
+        [Authorize(Roles = "Receptionist, Manager")]
         [HttpPut("{reservationId}/status")]
-        public IActionResult UpdateReservationStatus(int reservationId, [FromBody] string status)
+        public IActionResult UpdateReservationStatus(int reservationId, [FromBody] UpdateReservationStatusDto statusDto)
         {
-            _reservationService.UpdateReservationStatus(reservationId, status);
-            return Ok("Reservation status updated.");
+            _reservationService.UpdateReservationStatus(reservationId, statusDto.Status);
+            return Ok(new { msg = "Reservation status updated." });
         }
     }
+}
+
+public class UpdateReservationStatusDto
+{
+    public required string Status { get; set; }
 }

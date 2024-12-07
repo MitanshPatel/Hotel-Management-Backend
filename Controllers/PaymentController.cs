@@ -64,7 +64,7 @@ namespace Hostel_Management.Controllers
             }
 
             _paymentService.UpdatePayment(payment);
-            return Ok("Payment updated.");
+            return Ok(new { msg = "Payment updated." });
         }
 
         [Authorize(Roles = "Admin, Manager, Receptionist")]
@@ -72,7 +72,7 @@ namespace Hostel_Management.Controllers
         public IActionResult DeletePayment(int paymentId)
         {
             _paymentService.DeletePayment(paymentId);
-            return Ok("Payment deleted.");
+            return Ok(new { msg = "Payment deleted." });
         }
 
         [Authorize(Roles = "Admin, Manager, Receptionist")]
@@ -80,7 +80,7 @@ namespace Hostel_Management.Controllers
         public IActionResult UpdatePaymentStatus(int paymentId, [FromBody] string status)
         {
             _paymentService.UpdatePaymentStatus(paymentId, status);
-            return Ok("Payment status updated.");
+            return Ok(new { msg = "Payment status updated." });
         }
     }
 }

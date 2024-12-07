@@ -26,7 +26,7 @@ namespace Hostel_Management.Controllers
             return Ok(rooms);
         }
 
-        [Authorize(Roles = "Manager, Receptionist")]
+        [Authorize(Roles = "Manager, Receptionist, Guest, Housekeeping")]
         [HttpGet("{roomId}")]
         public IActionResult GetRoomById(int roomId)
         {

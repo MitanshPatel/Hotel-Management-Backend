@@ -32,7 +32,7 @@ namespace Hostel_Management.Services.Payment_Service
             return _paymentRepository.GetPaymentById(paymentId);
         }
 
-        public string AddPayment(Payment payment)
+        public object AddPayment(Payment payment)
         {
             // Get the reservation associated with the payment
             var reservation = _reservationRepository.GetReservationById(payment.ReservationId);
@@ -47,7 +47,7 @@ namespace Hostel_Management.Services.Payment_Service
                                                                  .Where(p => p.PaymentFor.StartsWith("Booking") && p.Status == "Successful");
                     if (existingRoomPayments.Any())
                     {
-                        return "A successful payment has already been made for the room for this reservation.";
+                        return new { msg = "A successful payment has already been made for the room for this reservation." };
                     }
                 }
 
@@ -77,14 +77,15 @@ namespace Hostel_Management.Services.Payment_Service
                     _serviceRepository.SaveChanges();
                 }
 
-                return "Payment processed successfully.";
+                return new { msg = "Payment processed successfully." };
             }
             else
             {
                 // Handle the case where the reservation is not approved
-                return "Payment cannot be processed because the reservation is not approved.";
+                return new { msg = "Payment cannot be processed because the reservation is not approved." };
             }
         }
+
 
 
 
