@@ -129,8 +129,8 @@ namespace Hostel_Management.Data
                 entity.Property(e => e.StaffId).IsRequired();
                 entity.Property(e => e.ShiftType).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.ShiftStartTime).IsRequired();
-                entity.Property(e => e.ShiftEndTime).IsRequired();
-                entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.ShiftEndTime).IsRequired(false);
+                entity.Property(e => e.Status).IsRequired(false).HasMaxLength(50);
             });
 
             modelBuilder.Entity<LeaveRequest>(entity =>
@@ -150,7 +150,8 @@ namespace Hostel_Management.Data
                 entity.HasKey(e => e.ReviewId);
                 entity.Property(e => e.ReviewId).ValueGeneratedOnAdd();
                 entity.Property(e => e.GuestId).IsRequired();
-                entity.Property(e => e.ReservationId).IsRequired();
+                entity.Property(e => e.ReservationId).IsRequired(false);
+                entity.Property(e => e.RoomId).IsRequired();
                 entity.Property(e => e.Rating).IsRequired();
                 entity.Property(e => e.Comments).HasMaxLength(1000);
                 entity.Property(e => e.ReviewDate).IsRequired();

@@ -115,6 +115,15 @@ namespace Hostel_Management.Controllers
             var reviews = _reviewService.GetAllReviews();
             return Ok(reviews);
         }
+
+        [Authorize(Roles = "Manager, Admin, Receptionist, Guest")]
+        [HttpGet("room/{roomId}")]
+        public IActionResult GetReviewsByRoomId(int roomId)
+        {
+            var reviews = _reviewService.GetReviewsByRoomId(roomId);
+            var averageRating = _reviewService.GetAverageRatingByRoomId(roomId);
+            return Ok(new { reviews, averageRating });
+        }
     }
 }
 

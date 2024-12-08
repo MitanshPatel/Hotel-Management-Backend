@@ -8,6 +8,8 @@ namespace Hostel_Management.Repositories
         IEnumerable<Review> GetAllReviews();
         IEnumerable<Review> GetReviewsByGuestId(int guestId);
         IEnumerable<Review> GetReviewsByReservationId(int reservationId);
+        IEnumerable<Review> GetReviewsByRoomId(int roomId); 
+        double GetAverageRatingByRoomId(int roomId); 
         Review GetReviewById(int reviewId);
         void AddReview(Review review);
         void UpdateReview(Review review);

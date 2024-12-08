@@ -37,9 +37,32 @@ namespace Hostel_Management.Controllers
                 return Unauthorized();
             }
             var staffId = int.Parse(staffIdClaim);
-            var schedule = _staffShiftService.GetShiftByStaffId(staffId);
-            return Ok(schedule);
+
+            // Get all schedules for the staff and sort by descending check-in date
+            var schedules = _staffScheduleService.GetSchedulesByStaffId(staffId)
+                                                 .OrderByDescending(s => s.ShiftStartTime)
+                                                 .ToList();
+
+            // Check the latest schedule
+            var latestSchedule = schedules.FirstOrDefault();
+            if (latestSchedule != null && latestSchedule.ShiftStartTime.Date == DateTime.Today)
+            {
+                if (latestSchedule.ShiftEndTime != null)
+                {
+                    // If today's attendance is done, return the latest schedule
+                    return Ok(new { attendance = true, schedule = latestSchedule });
+                }
+            }
+
+            // If no attendance is done for today, return the normal schedule
+            var shift = _staffShiftService.GetShiftByStaffId(staffId);
+            if (shift == null)
+            {
+                return NotFound(new { msg = "Shift not found for the staff." });
+            }
+            return Ok(new { attendance = false, schedule = shift });
         }
+
 
         [Authorize(Roles = "Receptionist, Housekeeping")]
         [HttpGet("my-attendance-history")]
@@ -68,7 +91,7 @@ namespace Hostel_Management.Controllers
             var shift = _staffShiftService.GetShiftByStaffId(staffId);
             if (shift == null)
             {
-                return NotFound("Shift not found for the staff.");
+                return NotFound(new { msg = "Shift not found for the staff." });
             }
 
             var schedule = new StaffSchedule
@@ -81,7 +104,7 @@ namespace Hostel_Management.Controllers
 
             _staffScheduleService.AddSchedule(schedule);
 
-            return Ok(new { scheduleId = schedule.ScheduleId, message = "Shift Started" });
+            return Ok(new { schedule, message = "Shift Started" });
         }
 
         [Authorize(Roles = "Receptionist, Housekeeping")]
@@ -97,13 +120,13 @@ namespace Hostel_Management.Controllers
             var schedule = _staffScheduleService.GetSchedulesByStaffId(staffId).FirstOrDefault(s => s.ScheduleId == scheduleId);
             if (schedule == null)
             {
-                return NotFound();
+                return NotFound(new { msg = "Please check in first" });
             }
 
             schedule.Status = "Ended";
-            schedule.ShiftEndTime = DateTime.Now; // Update the end time to the current time
+            schedule.ShiftEndTime = DateTime.Now;
             _staffScheduleService.UpdateSchedule(schedule);
-            return Ok("Shift Ended");
+            return Ok(new { msg = "Shift Ended" });
         }
 
         [Authorize(Roles = "Manager, Admin")]
@@ -119,8 +142,9 @@ namespace Hostel_Management.Controllers
         public IActionResult AddShift([FromBody] StaffShift shift)
         {
             _staffShiftService.AddShift(shift);
-            return CreatedAtAction(nameof(GetAllShifts), new { shiftId = shift.StaffShiftId }, shift);
-        }
+            CreatedAtAction(nameof(GetAllShifts), new { shiftId = shift.StaffShiftId }, shift);
+            return Ok(new {msg = "Shift Added" });
+        }   
 
         [Authorize(Roles = "Manager, Admin")]
         [HttpPut("shifts/{shiftId}")]
@@ -132,7 +156,7 @@ namespace Hostel_Management.Controllers
             }
 
             _staffShiftService.UpdateShift(shift);
-            return Ok("Shift Updated");
+            return Ok(new { msg = "Shift Updated" });
         }
 
         [Authorize(Roles = "Manager, Admin")]
@@ -140,7 +164,7 @@ namespace Hostel_Management.Controllers
         public IActionResult DeleteShift(int shiftId)
         {
             _staffShiftService.DeleteShift(shiftId);
-            return Ok("Shift Deleted");
+            return Ok(new { msg = "Shift Deleted" });
         }
     }
 }

@@ -7,7 +7,7 @@
         public string ShiftType { get; set; }
         public DateTime ShiftStartTime { get; set; }
         public DateTime? ShiftEndTime { get; set; }
-        public string Status { get; set; } // e.g., "Scheduled", "Started", "Ended", "Leave"
+        public string? Status { get; set; } // e.g., "Scheduled", "Started", "Ended", "Leave"
     }
 }
 

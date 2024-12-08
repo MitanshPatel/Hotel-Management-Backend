@@ -11,6 +11,8 @@ using Hostel_Management.Repositories.Payment_Repo;
 using Hostel_Management.Services.Payment_Service;
 using Hostel_Management.Repositories.Service_Repo;
 using Hostel_Management.Services.Service_Service;
+using Hostel_Management.Repositories.Analytics_Repo;
+using Hostel_Management.Services.Analytics_Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +53,9 @@ builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<AnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<AnalyticsRepository, AnalyticsRepository>();
+
 
 
 // add auth

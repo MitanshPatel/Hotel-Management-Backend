@@ -29,6 +29,16 @@ namespace Hostel_Management.Repositories
             return _context.Reviews.Where(r => r.ReservationId == reservationId).ToList();
         }
 
+        public IEnumerable<Review> GetReviewsByRoomId(int roomId)
+        {
+            return _context.Reviews.Where(r => r.RoomId == roomId).ToList();
+        }
+
+        public double GetAverageRatingByRoomId(int roomId)
+        {
+            return _context.Reviews.Where(r => r.RoomId == roomId).Average(r => r.Rating);
+        }
+
         public Review GetReviewById(int reviewId)
         {
             return _context.Reviews.Find(reviewId);

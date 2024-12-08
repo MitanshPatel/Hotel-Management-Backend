@@ -28,6 +28,16 @@ namespace Hostel_Management.Services
             return _reviewRepository.GetReviewsByReservationId(reservationId);
         }
 
+        public IEnumerable<Review> GetReviewsByRoomId(int roomId)
+        {
+            return _reviewRepository.GetReviewsByRoomId(roomId);
+        }
+
+        public double GetAverageRatingByRoomId(int roomId)
+        {
+            return _reviewRepository.GetAverageRatingByRoomId(roomId);
+        }
+
         public Review GetReviewById(int reviewId)
         {
             return _reviewRepository.GetReviewById(reviewId);
