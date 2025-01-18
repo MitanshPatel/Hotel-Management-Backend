@@ -17,6 +17,28 @@ namespace Hostel_Management.Repositories.Service_Repo
             return _context.Services.ToList();
         }
 
+        public (IEnumerable<Service> items, int totalCount) GetAllFoodServices(int guestId, int pageNumber, int pageSize)
+        {
+            var query = _context.Services
+                                .Where(s => s.GuestId == guestId && s.ServiceType.StartsWith("Food"))
+                                .OrderByDescending(s => s.RequestTime);
+            var totalCount = query.Count();
+            var items = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            return (items, totalCount);
+        }
+
+        public (IEnumerable<Service> items, int totalCount) GetAllServiceServices(int guestId, int pageNumber, int pageSize)
+        {
+            var query = _context.Services
+                                .Where(s => s.GuestId == guestId && s.ServiceType.StartsWith("Service"))
+                                .OrderByDescending(s => s.RequestTime);
+            var totalCount = query.Count();
+            var items = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            return (items, totalCount);
+        }
+
+
+
         public IEnumerable<Service> GetServicesByGuestId(int guestId)
         {
             return _context.Services.Where(s => s.GuestId == guestId).ToList();

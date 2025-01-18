@@ -104,7 +104,7 @@ namespace Hostel_Management.Controllers
 
         [Authorize(Roles = "Guest")]
         [HttpGet("my-food")]
-        public IActionResult GetMyFoodServices()
+        public IActionResult GetMyFoodServices([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var guestIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (guestIdClaim == null)
@@ -112,13 +112,13 @@ namespace Hostel_Management.Controllers
                 return Unauthorized();
             }
             var guestId = int.Parse(guestIdClaim);
-            var services = _serviceService.GetAllServices().Where(s => s.ServiceType.StartsWith("Food") && s.GuestId == guestId);
-            return Ok(services);
+            var (items, totalCount) = _serviceService.GetAllFoodServices(guestId, pageNumber, pageSize);
+            return Ok(new { items, totalCount });
         }
 
         [Authorize(Roles = "Guest")]
         [HttpGet("my-services")]
-        public IActionResult GetMyOtherServices()
+        public IActionResult GetMyOtherServices([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var guestIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (guestIdClaim == null)
@@ -126,8 +126,8 @@ namespace Hostel_Management.Controllers
                 return Unauthorized();
             }
             var guestId = int.Parse(guestIdClaim);
-            var services = _serviceService.GetAllServices().Where(s => s.ServiceType.StartsWith("Service") && s.GuestId == guestId);
-            return Ok(services);
+            var (items, totalCount) = _serviceService.GetAllServiceServices(guestId, pageNumber, pageSize);
+            return Ok(new { items, totalCount });
         }
     }
 }
