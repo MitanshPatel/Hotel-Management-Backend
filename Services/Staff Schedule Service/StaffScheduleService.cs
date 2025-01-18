@@ -44,7 +44,7 @@ namespace Hostel_Management.Services
                 var schedule = new StaffSchedule
                 {
                     StaffId = staffId,
-                    ShiftType = null,
+                    ShiftType = "None",
                     ShiftStartTime = date,
                     ShiftEndTime = date,
                     Status = "Leave"

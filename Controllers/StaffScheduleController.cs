@@ -40,12 +40,12 @@ namespace Hostel_Management.Controllers
 
             // Get all schedules for the staff and sort by descending check-in date
             var schedules = _staffScheduleService.GetSchedulesByStaffId(staffId)
-                                                 .OrderByDescending(s => s.ShiftStartTime)
+                                                 .Where(s => s.ShiftStartTime.Date == DateTime.Today)
                                                  .ToList();
 
             // Check the latest schedule
             var latestSchedule = schedules.FirstOrDefault();
-            if (latestSchedule != null && latestSchedule.ShiftStartTime.Date == DateTime.Today)
+            if (latestSchedule != null)
             {
                 if (latestSchedule.ShiftEndTime != null)
                 {

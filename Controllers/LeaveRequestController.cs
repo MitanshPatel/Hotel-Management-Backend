@@ -59,7 +59,7 @@ namespace Hostel_Management.Controllers
         public IActionResult ApproveLeaveRequest(int leaveRequestId)
         {
             _leaveRequestService.ApproveLeaveRequest(leaveRequestId);
-            return Ok("Leave Request Approved");
+            return Ok(new { msg = "Leave Request Approved" });
         }
 
         [Authorize(Roles = "Manager, Admin")]
@@ -67,7 +67,7 @@ namespace Hostel_Management.Controllers
         public IActionResult RejectLeaveRequest(int leaveRequestId)
         {
             _leaveRequestService.RejectLeaveRequest(leaveRequestId);
-            return Ok("Leave Request Rejected");
+            return Ok(new { msg = "Leave Request Rejected" });
         }
     }
 }
