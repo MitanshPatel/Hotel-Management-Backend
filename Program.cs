@@ -19,7 +19,8 @@ var builder = WebApplication.CreateBuilder(args);
 // to add secret keys
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("appsettings.Secret.json", optional: true, reloadOnChange: true);
+    .AddJsonFile("appsettings.Secret.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.Sql.json", optional: true, reloadOnChange: true);
 
 // fetch jwt keys
 var jwtSecret = builder.Configuration["Jwt:Secret"];
